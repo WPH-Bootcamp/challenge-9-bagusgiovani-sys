@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useAppSelector } from '@/store/hooks';
 
 interface NavbarProps {
   isLoggedIn?: boolean;
@@ -17,23 +18,13 @@ export default function Navbar({
   userAvatar,
 }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [cartCount, setCartCount] = useState(0);
+  const totalItems = useAppSelector((state) => state.cart.totalItems);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 0);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  useEffect(() => {
-    if (!isLoggedIn) {
-      setCartCount(0);
-      return;
-    }
-
-    // TODO: replace with real cart store (Redux)
-    setCartCount(2);
-  }, [isLoggedIn]);
 
   return (
     <nav
@@ -87,9 +78,9 @@ export default function Navbar({
                     width={24}
                     height={24}
                   />
-                  {cartCount > 0 && (
+                  {totalItems > 0 && (
                     <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-600 text-white text-xs rounded-full flex items-center justify-center font-medium">
-                      {cartCount > 9 ? '9+' : cartCount}
+                      {totalItems > 9 ? '9+' : totalItems}
                     </span>
                   )}
                 </Link>

@@ -32,10 +32,16 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expired or invalid
+      // Token expired or invalid - clear it but DON'T redirect
       if (typeof window !== 'undefined') {
         localStorage.removeItem('token');
-        window.location.href = '/login';
+        // Only redirect if we're on a protected route (profile, cart, checkout)
+        const protectedRoutes = ['/profile', '/cart', '/checkout'];
+        const currentPath = window.location.pathname;
+        
+        if (protectedRoutes.some(route => currentPath.startsWith(route))) {
+          window.location.href = '/login';
+        }
       }
     }
     return Promise.reject(error);

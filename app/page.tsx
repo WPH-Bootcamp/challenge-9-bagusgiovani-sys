@@ -1,13 +1,14 @@
 // 📄 FILE: app/page.tsx
+import MainLayout from '@/components/layout/MainLayout';
 import CategoryShortcuts from '@/features/restaurants/components/CategoryShortcuts';
 import RestaurantList from '@/features/restaurants/components/RestaurantList';
-import { SearchInput } from '@/components/layout/ui/SearchInput';
+import HeroSearch from '@/components/layout/HeroSearch';
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-white">
+    <MainLayout isLoggedIn={false}>
       {/* ================= HERO SECTION ================= */}
-      <section className="relative min-h-[85vh] -mx-8 md:-mx-16 lg:-mx-24 -mt-[88px] pt-[88px]">
+      <section className="relative min-h-[85vh] -mt-[88px]">
         {/* Background Image */}
         <div
           className="absolute inset-0 -z-10 bg-cover bg-center"
@@ -21,7 +22,7 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 to-black/50" />
 
         {/* Hero Content */}
-        <div className="relative flex min-h-[calc(120vh-88px)] flex-col items-center justify-center px-8 md:px-16 lg:px-24 text-center">
+        <div className="relative flex min-h-[85vh] flex-col items-center justify-center px-8 md:px-16 lg:px-24 text-center pt-[88px]">
           <h1 className="mb-4 text-5xl md:text-6xl font-bold text-white">
             Explore Culinary Experiences
           </h1>
@@ -30,20 +31,19 @@ export default function HomePage() {
             Search and refine your choice to discover the perfect restaurant.
           </p>
 
-          <SearchInput
-            placeholder="Search restaurants, food and drink"
-            className="w-full max-w-2xl"
-            variant="light"
-          />
+          <HeroSearch />
         </div>
       </section>
       {/* ================= END HERO ================= */}
 
-      {/* Category Shortcuts */}
-      <CategoryShortcuts />
+      {/* Content Section */}
+      <div className="px-8 md:px-16 lg:px-24">
+        {/* Category Shortcuts */}
+        <CategoryShortcuts />
 
-      {/* Recommended Restaurants */}
-      <RestaurantList />
-    </div>
+        {/* Recommended Restaurants */}
+        <RestaurantList />
+      </div>
+    </MainLayout>
   );
 }

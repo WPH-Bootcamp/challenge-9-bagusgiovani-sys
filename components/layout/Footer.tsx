@@ -24,7 +24,7 @@ export default function Footer() {
             <span>Foody</span>
           </Link>
           <p className="text-gray-400 mb-6 leading-relaxed text-sm">
-            Enjoy homemade flavors & chef's signature dishes, freshly prepared every day. Order online or visit our nearest branch.
+            Enjoy homemade flavors &amp; chef&apos;s signature dishes, freshly prepared every day. Order online or visit our nearest branch.
           </p>
           <p className="text-sm font-semibold mb-3">Follow on Social Media</p>
           <div className="flex gap-3">

@@ -1,5 +1,5 @@
 // 📄 FILE: features/auth/authSlice.ts
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { authService } from './services';
 import type { User, RegisterRequest, LoginRequest } from './types';
 
@@ -26,8 +26,9 @@ export const register = createAsyncThunk(
     try {
       const response = await authService.register(data);
       return response;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data || { message: 'Registration failed' });
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { data?: unknown } };
+      return rejectWithValue(axiosError.response?.data || { message: 'Registration failed' });
     }
   }
 );
@@ -38,8 +39,9 @@ export const login = createAsyncThunk(
     try {
       const response = await authService.login(data);
       return response;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data || { message: 'Login failed' });
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { data?: unknown } };
+      return rejectWithValue(axiosError.response?.data || { message: 'Login failed' });
     }
   }
 );
@@ -50,8 +52,9 @@ export const getProfile = createAsyncThunk(
     try {
       const response = await authService.getProfile();
       return response;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data || { message: 'Failed to get profile' });
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { data?: unknown } };
+      return rejectWithValue(axiosError.response?.data || { message: 'Failed to get profile' });
     }
   }
 );
@@ -79,13 +82,14 @@ const authSlice = createSlice({
       })
       .addCase(register.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user || null;
-        state.token = action.payload.token || null;
-        state.isAuthenticated = !!action.payload.token;
+        // API returns { success, message, data: { user, token } }
+        state.user = action.payload.data.user;
+        state.token = action.payload.data.token;
+        state.isAuthenticated = true;
       })
-      .addCase(register.rejected, (state, action: any) => {
+      .addCase(register.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload?.message || 'Registration failed';
+        state.error = (action.payload as { message?: string })?.message || 'Registration failed';
       });
 
     // Login
@@ -96,13 +100,14 @@ const authSlice = createSlice({
       })
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user || null;
-        state.token = action.payload.token || null;
-        state.isAuthenticated = !!action.payload.token;
+        // API returns { success, message, data: { user, token } }
+        state.user = action.payload.data.user;
+        state.token = action.payload.data.token;
+        state.isAuthenticated = true;
       })
-      .addCase(login.rejected, (state, action: any) => {
+      .addCase(login.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload?.message || 'Login failed';
+        state.error = (action.payload as { message?: string })?.message || 'Login failed';
       });
 
     // Get Profile
@@ -112,6 +117,7 @@ const authSlice = createSlice({
       })
       .addCase(getProfile.fulfilled, (state, action) => {
         state.loading = false;
+        // getProfile returns User directly (not wrapped in data)
         state.user = action.payload;
         state.isAuthenticated = true;
       })

@@ -11,7 +11,7 @@ export function AuthHeader() {
         <h1 className="text-2xl font-bold">Foody</h1>
       </div>
       <h2 className="text-2xl font-bold mb-2">Welcome Back</h2>
-      <p className="text-gray-600 text-sm">Good to see you again! Let's eat</p>
+      <p className="text-gray-600 text-sm">Good to see you again! Let&apos;s eat</p>
     </div>
   );
 }
