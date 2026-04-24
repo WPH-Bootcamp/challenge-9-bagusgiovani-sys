@@ -20,8 +20,9 @@ Snapshot of what is built, what is a stub, and what is missing.
 - Cart page (`app/cart/page.tsx`): reads Redux, groups items by restaurant, empty-state screen, total display, "Proceed to Checkout" button
 
 ### Home page
-- Hero section with full-screen background image, gradient overlay, `SearchInput` component (renders but **not wired** to state — see Gaps)
-- `CategoryShortcuts`: 6 static navigation links (All Restaurant / Nearby / Discount / Best Seller / Delivery / Lunch) pointing to `/restaurants?filter=...`
+- Hero section with full-screen background image, gradient overlay
+- `HeroSearch` (`components/layout/HeroSearch.tsx`): controlled `SearchInput`, navigates to `/restaurants?search=<query>` on Enter
+- `CategoryShortcuts`: 6 static navigation links pointing to `/restaurants?filter=...`
 - `RestaurantList`: calls `restaurantService.getRecommended()`, falls back to 12 hardcoded mock restaurants on any error, renders `RestaurantCard` grid
 
 ### Restaurant card
@@ -31,12 +32,17 @@ Snapshot of what is built, what is a stub, and what is missing.
 - Scroll-aware: transparent on top, white + shadow when scrolled
 - Logged-out state: Sign In + Sign Up links
 - Logged-in state: Cart icon (badge) + Profile avatar/name link
-- Cart badge count is **hardcoded to 2** (see Gaps)
+- Cart badge reads `totalItems` from Redux cart slice (no longer hardcoded)
 
 ### Profile page
 - Sidebar navigation with three sections: My Profile / My Orders / Delivery Address
 - Loading spinner while `useProfile` fetches
-- My Orders section: fetches from API via `getMyOrders()`, status tabs (Status / Ongoing / On the Way / Delivered / Done / Canceled), search by restaurant name, `OrderCard` with status badge, item list, total, date
+- My Orders section: fetches from API via `getMyOrders()`, status tabs, search by restaurant name, `OrderCard` with status badge, item list, total, date
+
+### Infrastructure
+- `QueryClientProvider` added via `store/provider.tsx` using `lib/queryClient.ts` — React Query now works everywhere
+- `restaurantService` (`features/restaurants/services.ts`): all 6 methods implemented — `getRecommended`, `getList`, `getById`, `search`, `getBestSeller`, `getNearby`
+- `npm run lint`: 0 errors (fixed pre-existing `no-explicit-any` and `no-unescaped-entities` errors)
 
 ---
 
@@ -44,7 +50,7 @@ Snapshot of what is built, what is a stub, and what is missing.
 
 ### Checkout page (`app/checkout/page.tsx`)
 - Layout matches Figma: left column (delivery address card + order items), right column (payment method selector + payment summary + Buy button)
-- **Everything is hardcoded**: address text is static, order items are a dummy `[...Array(2)]`, totals (Rp100.000 / Rp10.000 / Rp1.000 / Rp111.000) are static strings
+- **Everything is hardcoded**: address text is static, order items are a dummy `[...Array(2)]`, totals are static strings
 - Does NOT read from Redux cart, does NOT call the checkout API, "Buy" button does nothing
 
 ### Restaurants listing page (`app/restaurants/page.tsx`)
@@ -53,7 +59,7 @@ Snapshot of what is built, what is a stub, and what is missing.
 - Filter state is never applied to any data
 
 ### Restaurant detail page (`app/restaurants/[id]/page.tsx`)
-- Full layout: image gallery placeholder, restaurant info row (name / rating / distance), menu tabs (All Menu / Food / Drink), menu grid, reviews grid
+- Full layout: image gallery placeholder, restaurant info row, menu tabs (All Menu / Food / Drink), menu grid, reviews grid
 - **Route param `id` is never read** — no `useParams()` call, no API call
 - Menu `+` buttons do nothing — not dispatching to cart Redux
 - Review cards show hardcoded "Michael Brown" text
@@ -70,12 +76,20 @@ Snapshot of what is built, what is a stub, and what is missing.
 
 ---
 
-## Infrastructure gaps
+## Remaining gaps
 
 | Gap | Location | Note |
-|-----|---------|------|
-| `QueryClientProvider` missing | `app/layout.tsx` | `@tanstack/react-query` is installed but never provided — React Query cannot be used anywhere yet |
-| Navbar cart count hardcoded | `components/layout/Navbar.tsx:35` | Has a `// TODO: replace with real cart store (Redux)` comment; always shows 2 |
-| SearchInput uncontrolled | `app/page.tsx` | Component rendered without `value`/`onChange` props — search input does nothing |
-| `restaurantService` incomplete | `features/restaurants/services.ts` | Only `getRecommended()` exists; endpoints for list, search, detail, best-seller, nearby are defined in `constants/api.ts` but have no service method |
-| Delivery Address section | `app/profile/page.tsx:38` | Renders "coming soon..." placeholder |
+|-----|----------|------|
+| `MainLayout` auth props | All pages using `MainLayout` | `isLoggedIn` is hardcoded `false`; not read from Redux auth state |
+| Delivery Address section | `app/profile/page.tsx` | Renders "coming soon..." placeholder |
+
+---
+
+## Next step (start here next session)
+
+**Fill `useRestaurants` hook** (`features/restaurants/hooks/useRestaurants.ts`):
+- `useRestaurantList(filters?)` — React Query hook calling `restaurantService.getList(filters)`
+- `useRestaurantDetail(id)` — React Query hook calling `restaurantService.getById(id)`
+
+Then wire `app/restaurants/page.tsx` to use `useRestaurantList` (replace the `[...Array(8)]` placeholder).
+Then wire `app/restaurants/[id]/page.tsx` to use `useRestaurantDetail` (read `useParams`, call hook, render real data, wire menu `+` to cart).

@@ -18,7 +18,7 @@ No test suite is configured.
 Copy `.env.local` and set:
 
 ```
-NEXT_PUBLIC_API_BASE_URL=https://be-restaurant-api-889893107835.asia-southeast2.run.app
+NEXT_PUBLIC_API_BASE_URL=https://be-restaurant-production.up.railway.app
 ```
 
 Defaults to `http://localhost:8000` if unset. Backend Swagger at `/apiswagger/`.
